@@ -10,7 +10,7 @@ namespace calculator {
 				b2 = 1; break;
 			}
 		}
-		bool b3 = (c == '(') || (c == ')')||(c=='.');
+		bool b3 = (c == '(') || (c == ')')||(c=='.')||(c==' ');
 		return (b1||b2||b3);
 	}
 	Calculation::Calculation() :value_(0){
@@ -22,7 +22,7 @@ namespace calculator {
 	void Calculation::Show()
 	{
 		//expression_->ShowOff();//debug
-		printf("%s=%f\n", expression_->GetString(), expression_->GetValue());
+		printf("%s=%.2f\n", expression_->GetString(), expression_->GetValue());
 	}
 
 	bool Calculation::ReadInString(const char* s)
@@ -32,6 +32,7 @@ namespace calculator {
 		int i = 0,j=0;
 		while (!IsLegal(s[i]))i++;
 		while (IsLegal(s[i])) {
+			if (s[i] == ' ') { i++; continue; }//omit the quads
 			tmp[j] = s[i];
 			j++, i++;
 		}

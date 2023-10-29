@@ -27,7 +27,7 @@ namespace math {
 		double GetValue();
 		void ReadIn(const char *str);
 		//debug
-		void ShowOff();
+		void ShowOff(int tabs=0);
 		const char* GetString();
 		static const int LIMIT = 100;
 		static const int OP_LIMIT = 20;
