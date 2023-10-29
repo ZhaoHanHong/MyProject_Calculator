@@ -14,7 +14,6 @@ int main() {
 		c = getchar(), i++;
 	}
 	s[i] = '\0';
-	newcalculation.ReadInString(s);
-	newcalculation.Show();
+	if (newcalculation.ReadInString(s))newcalculation.Show();
 	return 0;
 }

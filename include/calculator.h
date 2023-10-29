@@ -12,7 +12,7 @@ namespace calculator {
 		Calculation();
 		Calculation(const char* inputstring);
 		void Show();
-		void ReadInString(const char* s);
+		bool ReadInString(const char* s);
 	};
 
 }

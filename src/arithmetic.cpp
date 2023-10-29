@@ -1,5 +1,4 @@
 #include "arithmetic.h"
-#include "arithmetic.h"
 #include <stdio.h>
 #include <cmath>
 
@@ -17,25 +16,40 @@ namespace math {
 	//template<typename T>
 	void Expression::ReadIn(const char* s)
 	{
-		//TODO: implement kuo hao
-		// think of 3+5/(2-1) and 2*(1+3)
+		// delete redundant kuohaos
+		int check_kuohao = 0;
+		int num_left = 0, num_right = 0;
+		int s_length = 0;
+		while (s[check_kuohao] == '(') {
+			check_kuohao++;
+		}num_left = check_kuohao;
+		while (s[check_kuohao])check_kuohao++;
+		s_length = check_kuohao;check_kuohao--;
+		while (s[check_kuohao]==')') {
+			check_kuohao--,num_right++;
+		}
+		int startpos = (-abs(num_left - num_right) + num_left + num_right) / 2;
+		int endpos = s_length - startpos - 1;
 		//initialize
 		exp_str_ = s;
-		int i = 0;
+		int i = startpos;
 		char* s1=new char[LIMIT]; int s1_count = 0;
 		char* s2=new char[LIMIT]; int s2_count = 0;
 		int* op_list = new int[OP_LIMIT]/*take down the position of operators*/; int ops_count = 0;
 		for (int j = 0; j < OP_LIMIT; j++)op_list[j] = -1;
-
-		
+		int in_kuohaos = 0;
 		//check operators
-		while (s[i] != '\0') {
-			if (op_list[ADD]==-1 && s[i] == ADD_str) {op_list[ADD] = i;}
-			if (op_list[MINUS]==-1 && s[i] == MINUS_str)op_list[MINUS] = i;
-			if (op_list[TIMES]==-1 && s[i] == TIMES_str)op_list[TIMES] = i;
-			if (op_list[DEVIDE]==-1 && s[i] == DEVIDE_str)op_list[DEVIDE] = i;
+		while (i<=endpos) {
+			//check whether in kuohaos
+			if (s[i] == '(')in_kuohaos++;
+			if (s[i] == ')')in_kuohaos--;
+			//identify operators
+			if (op_list[ADD]==-1 && s[i] == ADD_str&&!in_kuohaos) {op_list[ADD] = i;}
+			if (op_list[MINUS]==-1 && s[i] == MINUS_str&&!in_kuohaos)op_list[MINUS] = i;
+			if (op_list[TIMES]==-1 && s[i] == TIMES_str&&!in_kuohaos)op_list[TIMES] = i;
+			if (op_list[DEVIDE]==-1 && s[i] == DEVIDE_str&&!in_kuohaos)op_list[DEVIDE] = i;
 			i++;
-		}i = 0;
+		}i = startpos;
 		//search for operators,using OPERATOR_SEQUENCE
 		bool op_setted = 0; int check_i;
 		for (check_i = 0; OPERATOR_SEQUENCE[check_i]; check_i++) {
@@ -47,7 +61,7 @@ namespace math {
 		}
 		if (op_setted) {
 			int sep_pos = op_list[check_i];
-			while (s[i]) {
+			while (i<=endpos) {
 				if (i<sep_pos) {//read in expression1
 					if (s1_count >= LIMIT-1) {
 						printf("ERROR:Too long expression for s1!\n");
@@ -64,7 +78,7 @@ namespace math {
 				}
 				i++;
 			}
-			s1[s1_count] = '\0';//ending for a string
+			s1[s1_count] = '\0';//end the a string
 			s2[s2_count] = '\0';
 			//devide and conquer
 			if (!expression1_)expression1_ = new Expression();
@@ -78,18 +92,35 @@ namespace math {
     void Expression::Calculate()
     {
 		switch (op_) {
-		case -2: {//not activated
-			printf("Error:The statement isn't activated!\n");
-		}
 		case -1: {//convert the string in expression1 into numbers
-			int i = 0;
+			//identify decimal points
+			value_ = 0;
+			int i = 0, decimal_pt = -1;
 			while (exp_str_[i]) {
+				if (exp_str_[i] == '.') {
+					if (decimal_pt < 0) {
+						decimal_pt = i;
+					}
+					else {
+						printf("Error:too much decimal points for a number!The number is going to be rendered as 0.\n");
+						return;
+					}
+				}
 				i++;
 			}
 			int j = 0;
-			while (exp_str_[j]) {
-				value_ += double((exp_str_[j] - '0') * pow(10, i - j - 1)); 
-				j++;
+			if (decimal_pt > 0) {
+				for (j = 0; j < decimal_pt; j++) {
+					value_ += double((exp_str_[j] - '0') * pow(10, decimal_pt - j - 1));
+				}
+				for (j = decimal_pt + 1; j < i; j++) {
+					value_ += double((exp_str_[j] - '0') * pow(10, decimal_pt - j));
+				}
+			}
+			else {
+				for (j = 0; j < i; j++) {
+					value_ += double((exp_str_[j] - '0') * pow(10, i - j-1));
+				}
 			}
 			break;
 		}
@@ -138,7 +169,6 @@ namespace math {
 
 
 	//debug functions
-
 	void Expression::ShowOff() {
 		printf("My value is %f, and have operator %d\n",value_,op_);
 		printf("Firstly show you expression 1\n");
@@ -155,7 +185,7 @@ namespace math {
 		else {
 			printf("Expression 2 is null!\n");
 		}
-		printf("My structrue is shown\n");
+		printf("My structrue is shown!\n");
 		return;
 	}
 }

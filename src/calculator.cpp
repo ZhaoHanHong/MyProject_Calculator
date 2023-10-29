@@ -10,7 +10,8 @@ namespace calculator {
 				b2 = 1; break;
 			}
 		}
-		return (b1||b2);
+		bool b3 = (c == '(') || (c == ')')||(c=='.');
+		return (b1||b2||b3);
 	}
 	Calculation::Calculation() :value_(0){
 		expression_ = new math::Expression();
@@ -20,10 +21,11 @@ namespace calculator {
 	}
 	void Calculation::Show()
 	{
+		//expression_->ShowOff();//debug
 		printf("%s=%f\n", expression_->GetString(), expression_->GetValue());
 	}
 
-	void Calculation::ReadInString(const char* s)
+	bool Calculation::ReadInString(const char* s)
 	{
 		//first clean up the string for expression
 		char* tmp = new char[expression_->LIMIT];
@@ -34,7 +36,21 @@ namespace calculator {
 			j++, i++;
 		}
 		tmp[j] = '\0';
+		//check the kuohaos
+		int left_kuohao = 0;
+		for (int k = 0; k < j; k++) {
+			if (tmp[k] == '(')left_kuohao++;
+			if (tmp[k] == ')')
+			{
+				left_kuohao--;
+				if (left_kuohao < 0) {
+					printf("Error:Kuo Haos doesn't match\n");
+					return false;
+				}
+			}
+		}
+		//read in
 		expression_->ReadIn(tmp);
+		return true;
 	}
-
 }
