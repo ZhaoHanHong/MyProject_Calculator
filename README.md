@@ -2,7 +2,7 @@
 
 my expectation for the final calculator project:
 
-1. do basic arithmetics(+,-,*,/ and using 括号);
+1. do basic arithmetics(+,-,*,/ and using 括号);(**done!**)
 2. fraction results
 3. do algrbraic calculations (i.e. those with unknown $x$)
 4. numerically solve equations
